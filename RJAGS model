@@ -1,0 +1,48 @@
+model {
+		
+	### PRIORS ###
+	
+	l[1:L] ~ ddirch(rep(1, L))
+
+	for (l in 1:L) {
+		re.t[l, 1] ~ dunif(0, 5)
+		for (j in 2:J) {
+			re.t[l, j] <- re.t[l, 1]
+		}
+	}
+
+	for (l in 1:L) {
+		for (j in 1:J) {
+			p.t[l, j] ~ dnorm(0, 1)
+		}
+	}
+
+	for (i in 1:I) {
+    		re.i[i] ~ dnorm(0, 1)
+  	}	
+
+	### LIKELIHOOD ###
+
+	for (i in 1:I) {
+    
+		b[i] ~ dcat(l[1:L])
+    
+		for (j in 1:J) {
+			y[i, j] ~ dbin(p.i[b[i], i, j], 1)
+		}
+	
+		for (l in 1:L) {
+			for (j in 1:J) {
+				p.i[l, i, j] <- phi(p.t[l, j] + re.t[l, j] * re.i[i])
+ 			}
+		}
+	}
+
+	### PARAMETERS ###
+
+	for (l in 1:L) {
+  		for (j in 1:J) {
+    			t[l, j] <- phi(p.t[l, j] / sqrt(1 + pow(re.t[l, j], 2)) )
+  		}
+	}
+}
