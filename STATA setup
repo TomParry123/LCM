@@ -1,0 +1,28 @@
+*** 1 setup ***
+
+********************************************************************************		
+	
+	use "data", clear
+	
+	keep patient_id test1 test2 test3 test4 test5 test6 test7
+	
+	gen num = _n
+	egen pattern = concat(test1 test2 test3 test4 test5 test6 test7)
+
+	save "pattern.dta", replace
+	
+********************************************************************************
+	
+	use "data", clear
+	
+	keep test1 test2 test3 test4 test5 test6 test7
+	
+	local j = 1
+	foreach v of varlist  test1 test2 test3 test4 test5 test6 test7 {
+		rename `v' t`j'
+		local ++j
+	}
+	
+	export delimited "y.csv", replace
+
+********************************************************************************
